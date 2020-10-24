@@ -2,7 +2,7 @@ FROM alpine:latest
 
 EXPOSE 80
 
-RUN apk update && apk add lighttpd
+RUN apk update && apk add lighttpd wget
 
 # Lighttpd Setup
 RUN mkdir -p /var/www/localhost/htdocs/stats /var/log/lighttpd /var/lib/lighttpd
@@ -61,9 +61,19 @@ RUN apk add mysql mysql-client && \
 
 # Start DB to create admin user
 RUN mkdir -p /run/mysqld && touch /run/mysqld/mysqld.sock
-RUN mysqld --user=root --datadir='./data' &
-#RUN mysqladmin -u root password toor
-#RUN kill -9 $(pidof mysqld)
+ADD db_init.sh /db_init.sh
+RUN chmod +x /db_init.sh && /db_init.sh
+
+# Begin the install of gnusocial
+RUN wget https://git.gnu.io/gnu/gnu-social/-/archive/master/gnu-social-master.tar.gz && \
+	tar zxf gnu-social-*.tar.gz && \
+	rm -rf *.tar.gz && \
+	mv gnu-social-*/ gnusocial && \
+	cp /var/www/localhost/htdocs/info.php /gnusocial && \
+	rm -rf /var/www/localhost/htdocs && \
+	mv gnusocial /var/www/localhost/htdocs && \
+	chmod a+w /var/www/localhost/htdocs
+	#cp -r /var/www/localhost/htdocs/stats /gnusocial
 
 ADD entry.sh /entry.sh
 ENTRYPOINT ["sh", "/entry.sh"]
