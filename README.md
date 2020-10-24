@@ -8,7 +8,8 @@ $ sudo docker build -t "gnus:latest" .
 
 ## Once built
 // Currently there is an issue with the db init, hence the need for the following
-Inside the image run the following (changing "social" to something more secure",
+
+Inside the image run the following (changing "social" to something more secure"),
 ```
 $ echo "CREATE DATABASE social;" | mariadb
 $ echo "GRANT ALL on social.* TO 'social'@'localhost' IDENTIFIED BY 'social';" | mariadb
