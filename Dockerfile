@@ -8,7 +8,7 @@ RUN apk update && apk add lighttpd
 RUN mkdir -p /var/www/localhost/htdocs/stats /var/log/lighttpd /var/lib/lighttpd
 
 RUN sed -i -r 's#\#.*server.port.*=.*#server.port          = 80#g' /etc/lighttpd/lighttpd.conf && \
-	sed -i -r 's#.*server.stat-cache-engine.*=.*# server.stat-cache-engine = "fam"#g' /etc/lighttpd/lighttpd.conf && \
+	sed -i -r 's#.*server.stat-cache-engine.*=.*# server.stat-cache-engine = "simple"#g' /etc/lighttpd/lighttpd.conf && \
 	sed -i -r 's#\#.*server.event-handler = "linux-sysepoll".*#server.event-handler = "linux-sysepoll"#g' /etc/lighttpd/lighttpd.conf && \
 	chown -R lighttpd:lighttpd /var/www/localhost/ && \
 	chown -R lighttpd:lighttpd /var/lib/lighttpd && \
@@ -60,10 +60,10 @@ RUN apk add mysql mysql-client && \
 	mysql_install_db
 
 # Start DB to create admin user
-#RUN mkdir -p /run/mysqld && touch /run/mysqld/mysqld.sock
+RUN mkdir -p /run/mysqld && touch /run/mysqld/mysqld.sock
 RUN mysqld --user=root --datadir='./data' &
-RUN mysqladmin -u root password toor
-RUN kill -9 $(pidof mysqld)
+#RUN mysqladmin -u root password toor
+#RUN kill -9 $(pidof mysqld)
 
 ADD entry.sh /entry.sh
-CMD ["/entry.sh"]
+ENTRYPOINT ["sh", "/entry.sh"]
